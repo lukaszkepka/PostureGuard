@@ -1,3 +1,3 @@
-[submodule "3rdparty/CenterNet"]
-	path = 3rdparty/CenterNet
+[submodule "3rd_party/CenterNet"]
+	path = 3rd_party/CenterNet
 	url = https://github.com/lukaszkepka/CenterNet
