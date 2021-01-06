@@ -54,6 +54,7 @@ def get_frame_class(key):
 def main(args):
     if not path.exists(args.video_file_path):
         print("File () doesn't exist".format(args.video_file_path))
+        return
 
     frame_num = 1
     cap = cv2.VideoCapture(args.video_file_path)
@@ -71,6 +72,7 @@ def main(args):
         cv2.imshow('frame', frame)
         key = cv2.waitKeyEx(10)
 
+        # Classify and save frame
         frame_class = get_frame_class(key)
         if frame_class is not None:
             classify_and_save_frame(frame, frame_class, video_file_name, frame_num)
@@ -80,7 +82,6 @@ def main(args):
     # When everything done, release the capture
     cap.release()
     cv2.destroyAllWindows()
-    pass
 
 
 if __name__ == '__main__':
