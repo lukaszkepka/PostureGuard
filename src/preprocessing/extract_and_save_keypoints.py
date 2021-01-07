@@ -5,7 +5,7 @@ import pandas as pd
 import cv2
 import progressbar
 
-from annotations.annotations import ImageAnnotation, SUPPORTED_CLASSES
+from annotations import ImageAnnotation, SUPPORTED_CLASSES
 from keypoints_detection.KeypointDetector import KeypointDetector
 from keypoints_detection.factory import create_keypoint_detector
 
@@ -17,8 +17,10 @@ class InvalidDirectoryStructureError(Exception):
 
 
 def parse_args():
-    # TODO: Add desc
-    ap = argparse.ArgumentParser(description='')
+    ap = argparse.ArgumentParser(description='Processes images placed in images_directory with keypoint detector and '
+                                             'creates annotation file for whole dataset in csv format. Images in '
+                                             'images_directory must be organized in subfolders named by image '
+                                             'class names')
     ap.add_argument("-i", "--images_directory", required=True,
                     help="Path to directory with images")
     ap.add_argument("-m", "--model_path", required=True,
@@ -67,6 +69,9 @@ def process_images(images_directory, keypoint_detector: KeypointDetector):
 def process_image(image_path, keypoint_detector: KeypointDetector):
     keypoints = keypoint_detector.detect(image_path)
 
+    if len(keypoints) == 0:
+        return None
+
     # We process only first detection
     # TODO: Select detection by size or something else
     keypoints = keypoints[0]
@@ -75,6 +80,9 @@ def process_image(image_path, keypoint_detector: KeypointDetector):
 
 
 def get_image_annotation(image_path, class_name, keypoints):
+    if keypoints is None:
+        return pd.DataFrame()
+
     img = cv2.imread(image_path)
     height, width, channels = img.shape
 

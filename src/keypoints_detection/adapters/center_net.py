@@ -5,7 +5,7 @@ import cv2
 
 from CenterNet.src.lib.detectors.detector_factory import detector_factory
 from CenterNet.src.lib.opts import opts
-from annotations.annotations import Keypoints
+from annotations import Keypoints
 from keypoints_detection.KeypointDetector import KeypointDetector
 
 
