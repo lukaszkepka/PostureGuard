@@ -1,3 +1,5 @@
+from typing import List
+
 import pandas as pd
 
 SUPPORTED_CLASSES = ['not_correct', 'correct']
@@ -6,7 +8,7 @@ SUPPORTED_CLASSES = ['not_correct', 'correct']
 class Keypoints:
     NUMBER_OF_JOINTS = 17
     ATTRIBUTES = [
-        'bounding_box_1', 'bounding_box_2', 'bounding_box_3', 'bounding_box_4', 'confidence',
+        'bounding_box_lu_x', 'bounding_box_lu_y', 'bounding_box_rd_x', 'bounding_box_rd_y', 'confidence',
         'nose_x', 'nose_y',
         'r_eye_x', 'r_eye_y',
         'l_eye_x', 'l_eye_y',
@@ -44,9 +46,10 @@ class Keypoints:
             raise ValueError(f'Keypoints should be in shape ({cls.NUMBER_OF_JOINTS}, 2)')
 
         keypoint_coords = list(points.reshape(2 * cls.NUMBER_OF_JOINTS))
-        attributes_list = bounding_box + [confidence] + keypoint_coords
+        bounding_box_coords = list(bounding_box)
+        data_frame_values = tuple(bounding_box_coords + [confidence] + keypoint_coords)
 
-        data_frame = pd.DataFrame.from_records([tuple(attributes_list)], columns=cls.ATTRIBUTES)
+        data_frame = pd.DataFrame.from_records([data_frame_values], columns=cls.ATTRIBUTES)
         return cls(data_frame)
 
     def _get_keypoint_coords(self, keypoint_name):
@@ -56,10 +59,8 @@ class Keypoints:
     @property
     def bounding_box(self):
         return [
-            (_get_first_row_value_from_data_frame(self._data_frame, 'bounding_box_1'),
-             _get_first_row_value_from_data_frame(self._data_frame, 'bounding_box_2')),
-            (_get_first_row_value_from_data_frame(self._data_frame, 'bounding_box_3'),
-             _get_first_row_value_from_data_frame(self._data_frame, 'bounding_box_4')),
+            self._get_keypoint_coords('bounding_box_lu'),
+            self._get_keypoint_coords('bounding_box_rd'),
             _get_first_row_value_from_data_frame(self._data_frame, 'confidence')
         ]
 
@@ -184,3 +185,7 @@ class ImageAnnotation:
 
 def _get_first_row_value_from_data_frame(dataframe, column):
     return dataframe[column].values[0]
+
+
+def data_frame_to_annotations_list(data_frame: pd.DataFrame) -> List[ImageAnnotation]:
+    return [ImageAnnotation.from_data_frame(row[1].to_frame().transpose()) for row in data_frame.iterrows()]
