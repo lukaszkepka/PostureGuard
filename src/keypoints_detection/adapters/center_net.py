@@ -24,25 +24,17 @@ class CenterNetKeypointDetectorAdapter(KeypointDetector):
 
     def detect(self, image_path) -> List[Keypoints]:
         ret = self.detector.run(image_path)
-        bboxes = ret['results'][1]
+        multipose_detections = ret['results'][1]
 
-        detections = [self.map_result_to_keypoints(bbox) for bbox in bboxes if bbox[4] > self.opt.vis_thresh]
-
-        if self.debug:
-            image = cv2.imread(image_path)
-            for k in detections:
-                cv2.circle(image, k.l_knee, 3, (255, 0, 255), -1)
-                cv2.circle(image, k.r_knee, 3, (255, 0, 0), -1)
-
-            cv2.imshow('keypoints', image)
-            cv2.waitKey(0)
-
-        return detections
+        return [self.map_result_to_keypoints(multipose_detection) for multipose_detection in multipose_detections
+                if multipose_detection[4] > self.opt.vis_thresh]
 
     @staticmethod
-    def map_result_to_keypoints(bbox):
-        points = np.array(bbox[5:39], dtype=np.int32).reshape(Keypoints.NUMBER_OF_JOINTS, 2)
-        return Keypoints.from_detection_result(bounding_box=bbox[:4], confidence=bbox[4], points=points)
+    def map_result_to_keypoints(multipose_detection):
+        confidence = round(multipose_detection[4], 2)
+        bounding_box = np.array(multipose_detection[:4], dtype=np.int32)
+        points = np.array(multipose_detection[5:39], dtype=np.int32).reshape(Keypoints.NUMBER_OF_JOINTS, 2)
+        return Keypoints.from_detection_result(bounding_box=bounding_box, confidence=confidence, points=points)
 
     @staticmethod
     def get_center_net_args(model_path):

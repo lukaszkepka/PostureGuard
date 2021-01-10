@@ -1,11 +1,14 @@
 import argparse
 import os.path as path
-from typing import List
 
 import cv2
 import pandas as pd
 
-from annotations import ImageAnnotation
+from annotations import ImageAnnotation, data_frame_to_annotations_list
+
+BOUNDING_BOX_COLOR = (0, 255, 255)
+KEYPOINT_COLOR = (0, 255, 0)
+TEXT_COLOR = (255, 0, 0)
 
 
 def parse_args():
@@ -32,14 +35,13 @@ def display_annotations(image_annotations: ImageAnnotation):
 
 
 def put_file_path(image, file_path):
-    cv2.putText(image, file_path, (25, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2,
+    text_localisation = (25, 25)
+    cv2.putText(image, file_path, text_localisation, cv2.FONT_HERSHEY_SIMPLEX, 1, TEXT_COLOR, 2,
                 cv2.LINE_AA)
 
 
 def put_bounding_box(image, bounding_box):
-    bounding_box_start_point = (int(bounding_box[0][0]), int(bounding_box[0][1]))
-    bounding_box_end_point = (int(bounding_box[1][0]), int(bounding_box[1][1]))
-    cv2.rectangle(image, bounding_box_start_point, bounding_box_end_point, (0, 255, 255))
+    cv2.rectangle(image, bounding_box[0], bounding_box[1], BOUNDING_BOX_COLOR)
 
 
 def put_keypoint(image, localisation, name):
@@ -47,13 +49,9 @@ def put_keypoint(image, localisation, name):
     text_localisation = tuple([localisation[0] + text_to_point_offset[0],
                                localisation[1] + text_to_point_offset[1]])
 
-    cv2.circle(image, localisation, 3, (255, 0, 255), -1)
-    cv2.putText(image, name, text_localisation, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2,
+    cv2.circle(image, localisation, 3, KEYPOINT_COLOR, -1)
+    cv2.putText(image, name, text_localisation, cv2.FONT_HERSHEY_SIMPLEX, 1, TEXT_COLOR, 2,
                 cv2.LINE_AA)
-
-
-def data_frame_to_annotations_list(data_frame: pd.DataFrame) -> List[ImageAnnotation]:
-    return [ImageAnnotation.from_data_frame(row[1].to_frame().transpose()) for row in data_frame.iterrows()]
 
 
 def main(args):
