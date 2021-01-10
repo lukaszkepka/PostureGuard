@@ -2,6 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/3rd_party/CenterNet" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/3rd_party/CenterNet/src/lib/models/networks/DCNv2" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/3rdparty/CenterNet" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/3rdparty/CenterNet/src/lib/models/networks/DCNv2" vcs="Git" />
   </component>

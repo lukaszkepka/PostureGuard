@@ -30,7 +30,7 @@ class Keypoints:
             raise ValueError('DataFrame columns doesn\'t matches Keypoint attributes')
 
         if len(data_frame) != 1:
-            raise ValueError('DataFrame should have exactly one column')
+            raise ValueError('DataFrame should have exactly one row')
 
         self._data_frame = data_frame
 
