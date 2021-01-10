@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import List
 
-from annotations.annotations import Keypoints
+from annotations import Keypoints
 
 
 class KeypointDetector:

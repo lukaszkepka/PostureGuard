@@ -4,9 +4,11 @@ import os
 import cv2
 import os.path as path
 
+from annotations import SUPPORTED_CLASSES
+
 key_mapping = {
-    'a': 'not_correct',
-    'd': 'correct'
+    'a': SUPPORTED_CLASSES[0],
+    'd': SUPPORTED_CLASSES[1],
 }
 
 
@@ -40,8 +42,12 @@ def classify_and_save_frame(frame, class_name, video_file_name, frame_num):
 
 
 def put_key_mapping_text(frame):
-    cv2.putText(frame, 'a - not_correct', (25, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-    cv2.putText(frame, 'd - correct', (25, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
+    margin_y = 35
+    text_coords = [25, 25]
+    for key, label in key_mapping.items():
+        cv2.putText(frame, f'{key} - {label}', tuple(text_coords), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2,
+                    cv2.LINE_AA)
+        text_coords[1] += margin_y
 
 
 def get_frame_class(key):
@@ -63,6 +69,7 @@ def main(args):
     while True:
         # Capture frame-by-frame
         ret, frame = cap.read()
+        original_frame = frame.copy()
 
         if ret < 0:
             break
@@ -75,7 +82,7 @@ def main(args):
         # Classify and save frame
         frame_class = get_frame_class(key)
         if frame_class is not None:
-            classify_and_save_frame(frame, frame_class, video_file_name, frame_num)
+            classify_and_save_frame(original_frame, frame_class, video_file_name, frame_num)
 
         frame_num += 1
 
