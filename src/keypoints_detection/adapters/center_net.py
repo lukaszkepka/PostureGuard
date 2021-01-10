@@ -42,7 +42,7 @@ class CenterNetKeypointDetectorAdapter(KeypointDetector):
     @staticmethod
     def map_result_to_keypoints(bbox):
         points = np.array(bbox[5:39], dtype=np.int32).reshape(Keypoints.NUMBER_OF_JOINTS, 2)
-        return Keypoints(bounding_box=bbox[:4], confidence=bbox[4], points=points)
+        return Keypoints.from_detection_result(bounding_box=bbox[:4], confidence=bbox[4], points=points)
 
     @staticmethod
     def get_center_net_args(model_path):

@@ -86,7 +86,7 @@ def get_image_annotation(image_path, class_name, keypoints):
     img = cv2.imread(image_path)
     height, width, channels = img.shape
 
-    annotation = ImageAnnotation(image_path, (height, width), class_name, keypoints)
+    annotation = ImageAnnotation.from_parameters(image_path, (height, width), class_name, keypoints)
     return annotation.to_dataframe()
 
 

@@ -69,6 +69,7 @@ def main(args):
     while True:
         # Capture frame-by-frame
         ret, frame = cap.read()
+        original_frame = frame.copy()
 
         if ret < 0:
             break
@@ -81,7 +82,7 @@ def main(args):
         # Classify and save frame
         frame_class = get_frame_class(key)
         if frame_class is not None:
-            classify_and_save_frame(frame, frame_class, video_file_name, frame_num)
+            classify_and_save_frame(original_frame, frame_class, video_file_name, frame_num)
 
         frame_num += 1
 
