@@ -52,6 +52,13 @@ class Keypoints:
         data_frame = pd.DataFrame.from_records([data_frame_values], columns=cls.ATTRIBUTE_NAMES)
         return cls(data_frame)
 
+    @classmethod
+    def get_point_attribute_name(cls, coordinate='x'):
+        if coordinate not in ['x', 'y']:
+            raise ValueError('coordinate should be x or y')
+
+        return [attribute_name for attribute_name in cls.ATTRIBUTE_NAMES if attribute_name.endswith(coordinate)]
+
     def _get_keypoint_coords(self, keypoint_name):
         return _get_first_row_value_from_data_frame(self._data_frame, f'{keypoint_name}_x'), \
                _get_first_row_value_from_data_frame(self._data_frame, f'{keypoint_name}_y')

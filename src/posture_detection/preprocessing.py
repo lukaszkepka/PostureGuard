@@ -4,6 +4,8 @@ from typing import List
 
 import pandas as pd
 
+from annotations import Keypoints
+
 
 class PreProcessingStep(ABC):
 
@@ -34,28 +36,8 @@ class RemoveColumns(PreProcessingStep):
 class NormalizePointCoordinatesToBoundingBox(PreProcessingStep):
 
     def run(self, annotations: pd.DataFrame):
-        x = annotations.filter(items=[
-            'bounding_box_lu_x', 'bounding_box_rd_x',
-            'nose_x', 'r_eye_x', 'l_eye_x',
-            'r_ear_x', 'l_ear_x',
-            'r_shoulder_x', 'l_shoulder_x',
-            'r_elbow_x', 'l_elbow_x',
-            'r_hand_x', 'l_hand_x',
-            'r_hip_x', 'l_hip_x',
-            'r_knee_x', 'l_knee_x',
-            'r_feet_x', 'l_feet_x',
-        ])
-        y = annotations.filter(items=[
-            'bounding_box_lu_y', 'bounding_box_rd_y',
-            'nose_y', 'r_eye_y', 'l_eye_y',
-            'r_ear_y', 'l_ear_y',
-            'r_shoulder_y', 'l_shoulder_y',
-            'r_elbow_y', 'l_elbow_y',
-            'r_hand_y', 'l_hand_y',
-            'r_hip_y', 'l_hip_y',
-            'r_knee_y', 'l_knee_y',
-            'r_feet_y', 'l_feet_y',
-        ])
+        x = annotations.filter(items=Keypoints.get_point_attribute_name(coordinate='x'))
+        y = annotations.filter(items=Keypoints.get_point_attribute_name(coordinate='y'))
 
         # We take min and max points instead of bounding box boundaries
         # because points can be a little bit outside box.
