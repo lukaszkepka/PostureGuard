@@ -7,8 +7,13 @@ SUPPORTED_CLASSES = ['not_correct', 'correct']
 
 class Keypoints:
     NUMBER_OF_JOINTS = 17
-    ATTRIBUTE_NAMES = [
-        'bounding_box_lu_x', 'bounding_box_lu_y', 'bounding_box_rd_x', 'bounding_box_rd_y', 'confidence',
+    BOUNDING_BOX_ATTRIBUTE_NAMES = [
+        'bounding_box_lu_x', 'bounding_box_lu_y',
+        'bounding_box_rd_x', 'bounding_box_rd_y',
+        'confidence'
+    ]
+
+    BODY_POINTS_ATTRIBUTE_NAMES = [
         'nose_x', 'nose_y',
         'r_eye_x', 'r_eye_y',
         'l_eye_x', 'l_eye_y',
@@ -25,7 +30,10 @@ class Keypoints:
         'r_knee_x', 'r_knee_y',
         'l_knee_x', 'l_knee_y',
         'r_feet_x', 'r_feet_y',
-        'l_feet_x', 'l_feet_y']
+        'l_feet_x', 'l_feet_y'
+    ]
+
+    ATTRIBUTE_NAMES = BOUNDING_BOX_ATTRIBUTE_NAMES + BODY_POINTS_ATTRIBUTE_NAMES
 
     def __init__(self, data_frame: pd.DataFrame):
         if any(data_frame.columns != self.ATTRIBUTE_NAMES):
