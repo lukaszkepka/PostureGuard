@@ -12,10 +12,7 @@ TEXT_COLOR = (255, 0, 0)
 
 
 def parse_args():
-    ap = argparse.ArgumentParser(description="Extracts and displays consecutive frames from video file. Each frame can "
-                                             "be classified as 'correct' or 'not_correct' by pressing keys 'a' or 'd'. "
-                                             "When frame is classified it is saved to following path: "
-                                             "<output_directory>/<class_name>/<video_file_name>_<frame_number>.jpg")
+    ap = argparse.ArgumentParser(description="Displays keypoints saved in annotations file")
     ap.add_argument("-i", "--annotations_file_path", required=True,
                     help="Path to annotations in csv format")
     return ap.parse_args()
