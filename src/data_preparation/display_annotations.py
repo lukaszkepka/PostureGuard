@@ -27,7 +27,7 @@ def display_annotations(image_annotations: ImageAnnotation):
 
     put_file_path(image, image_annotations.file_path)
     put_bounding_box(image, keypoints.bounding_box)
-    for joint_name, localisation in keypoints.to_joint_dict().items():
+    for joint_name, localisation in keypoints.to_keypoint_dict().items():
         put_keypoint(image, localisation, joint_name)
 
     cv2.imshow('annotations', image)

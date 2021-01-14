@@ -7,7 +7,7 @@ SUPPORTED_CLASSES = ['not_correct', 'correct']
 
 class Keypoints:
     NUMBER_OF_JOINTS = 17
-    ATTRIBUTES = [
+    ATTRIBUTE_NAMES = [
         'bounding_box_lu_x', 'bounding_box_lu_y', 'bounding_box_rd_x', 'bounding_box_rd_y', 'confidence',
         'nose_x', 'nose_y',
         'r_eye_x', 'r_eye_y',
@@ -28,7 +28,7 @@ class Keypoints:
         'l_feet_x', 'l_feet_y']
 
     def __init__(self, data_frame: pd.DataFrame):
-        if any(data_frame.columns != self.ATTRIBUTES):
+        if any(data_frame.columns != self.ATTRIBUTE_NAMES):
             raise ValueError('DataFrame columns doesn\'t matches Keypoint attributes')
 
         if len(data_frame) != 1:
@@ -49,7 +49,7 @@ class Keypoints:
         bounding_box_coords = list(bounding_box)
         data_frame_values = tuple(bounding_box_coords + [confidence] + keypoint_coords)
 
-        data_frame = pd.DataFrame.from_records([data_frame_values], columns=cls.ATTRIBUTES)
+        data_frame = pd.DataFrame.from_records([data_frame_values], columns=cls.ATTRIBUTE_NAMES)
         return cls(data_frame)
 
     def _get_keypoint_coords(self, keypoint_name):
@@ -135,7 +135,7 @@ class Keypoints:
     def to_dataframe(self) -> pd.DataFrame:
         return self._data_frame
 
-    def to_joint_dict(self):
+    def to_keypoint_dict(self):
         return {
             'nose': self.nose,
             'r_eye': self.r_eye,
@@ -158,11 +158,11 @@ class Keypoints:
 
 
 class ImageAnnotation:
-    ATTRIBUTES = ['file_path', 'original_size_h', 'original_size_w', 'class']
+    ATTRIBUTE_NAMES = ['file_path', 'original_size_h', 'original_size_w', 'class']
 
     def __init__(self, data_frame: pd.DataFrame):
-        self._data_frame = data_frame.filter(items=self.ATTRIBUTES)
-        self.keypoints = Keypoints.from_data_frame(data_frame.filter(items=Keypoints.ATTRIBUTES))
+        self._data_frame = data_frame.filter(items=self.ATTRIBUTE_NAMES)
+        self.keypoints = Keypoints.from_data_frame(data_frame.filter(items=Keypoints.ATTRIBUTE_NAMES))
 
     @classmethod
     def from_data_frame(cls, data_frame: pd.DataFrame):
@@ -172,7 +172,7 @@ class ImageAnnotation:
     def from_parameters(cls, file_path, original_size, class_name, keypoints: Keypoints):
         data_frame = pd.DataFrame.from_records([
             (file_path, original_size[0], original_size[1], class_name)],
-            columns=cls.ATTRIBUTES)
+            columns=cls.ATTRIBUTE_NAMES)
         return cls(data_frame.join(keypoints.to_dataframe()))
 
     @property
