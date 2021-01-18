@@ -76,7 +76,10 @@ class PreProcessingPipeline:
         self._steps = steps
 
     def run(self, annotations: pd.DataFrame) -> pd.DataFrame:
-        for step in self._steps:
-            annotations = step.run(annotations)
+        results = []
+        for row in annotations.iloc:
+            for step in self._steps:
+                row = step.run(row)
+            results.append(row)
 
-        return annotations
+        return pd.DataFrame(results)
