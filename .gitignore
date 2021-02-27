@@ -94,3 +94,4 @@ modules.xml
 # End of https://www.toptal.com/developers/gitignore/api/pycharm+all
 
 **/*.pyc
+/src/posture_detection/models/**
