@@ -69,15 +69,15 @@ def main(args):
     while True:
         # Capture frame-by-frame
         ret, frame = cap.read()
-        original_frame = frame.copy()
-
-        if ret < 0:
+        if ret < 0 or frame is None:
             break
+
+        original_frame = frame.copy()
 
         # Display the resulting frame
         put_key_mapping_text(frame)
         cv2.imshow('frame', frame)
-        key = cv2.waitKeyEx(10)
+        key = cv2.waitKeyEx(50)
 
         # Classify and save frame
         frame_class = get_frame_class(key)
