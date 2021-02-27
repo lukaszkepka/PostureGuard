@@ -1,2 +1,2 @@
 # PostureGuard
-Realtime detection of incorrect computer posture 
+Realtime detection of incorrect sitting posture 
