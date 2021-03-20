@@ -3,8 +3,6 @@ import os.path as path
 
 import cv2
 import numpy as np
-import pandas as pd
-import tensorflow as tf
 from tensorflow import keras
 
 from annotations import SUPPORTED_CLASSES, ImageAnnotation
@@ -21,7 +19,7 @@ def parse_args():
                     help="Path to trained model")
     ap.add_argument("-k", "--keypoint_detector_model_path", required=True,
                     help="Path to keypoint detection model")
-    return ap.parse()
+    return ap.parse_args()
 
 
 def main(args):
@@ -50,11 +48,11 @@ def process_frame(frame, keypoint_detector, posture_detector):
     height, width, channels = frame.shape
 
     annotation = ImageAnnotation.from_parameters('', (height, width), '', keypoints)
-    df = annotation.to_dataframe()
+    annotation_data_frame = annotation.to_dataframe()
 
-    dataset = PREPROCESSING_PIPELINE.run(df)
+    annotation_data_frame = PREPROCESSING_PIPELINE.run(annotation_data_frame)
 
-    predictions = posture_detector.predict(dataset.values)
+    predictions = posture_detector.predict(annotation_data_frame.values)
     prediction_index = int(np.round(predictions))
 
     annotation.class_name = SUPPORTED_CLASSES[prediction_index]
@@ -63,7 +61,7 @@ def process_frame(frame, keypoint_detector, posture_detector):
 
 def process_video(video_file_path, keypoint_detector, posture_detector):
     frame_num = 1
-    display_interval = 5
+    display_interval = 3
     cap = cv2.VideoCapture(video_file_path)
 
     while True:
