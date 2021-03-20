@@ -2,15 +2,13 @@ import argparse
 import os.path as path
 
 import cv2
-import pandas as pd
 import numpy as np
+import pandas as pd
 import tensorflow as tf
-from sklearn.model_selection import train_test_split
 from tensorflow import keras
 
-from annotations import Keypoints, SUPPORTED_CLASSES
-from posture_detection.preprocessing import PreProcessingPipeline, NormalizePointCoordinatesToBoundingBox, \
-    KeepColumns, PointsToVectors
+from annotations import SUPPORTED_CLASSES
+from posture_detection.train_model import PREPROCESSING_PIPELINE
 
 
 def parse_args():
@@ -25,14 +23,7 @@ def parse_args():
 def get_predictions_and_labels(model_path, annotations_data_frame):
     model = keras.models.load_model(model_path)
 
-    preprocessing_pipeline = PreProcessingPipeline([
-        KeepColumns(Keypoints.ATTRIBUTE_NAMES),
-        NormalizePointCoordinatesToBoundingBox(),
-        KeepColumns(Keypoints.BODY_POINTS_ATTRIBUTE_NAMES),
-        PointsToVectors(starting_point_name='center')
-    ])
-
-    dataset = preprocessing_pipeline.run(annotations_data_frame)
+    dataset = PREPROCESSING_PIPELINE.run(annotations_data_frame)
     labels = pd.Categorical(annotations_data_frame['class'], categories=SUPPORTED_CLASSES).codes
 
     predictions = model.predict(dataset.values)

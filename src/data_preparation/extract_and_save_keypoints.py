@@ -104,7 +104,7 @@ def main(args):
         print("Directory () doesn't exist".format(args.images_directory))
         return
 
-    keypoint_detector = create_keypoint_detector(args)
+    keypoint_detector = create_keypoint_detector(args.model_path)
     annotations_df = process_images(args.images_directory, keypoint_detector)
 
     output_path = os.path.join(args.images_directory, 'annotations.csv')

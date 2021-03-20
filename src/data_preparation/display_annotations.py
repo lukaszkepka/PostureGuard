@@ -3,6 +3,7 @@ import os.path as path
 
 import cv2
 import pandas as pd
+from numpy.core.multiarray import ndarray
 
 from annotations import ImageAnnotation, data_frame_to_annotations_list
 
@@ -18,22 +19,36 @@ def parse_args():
     return ap.parse_args()
 
 
-def display_annotations(image_annotations: ImageAnnotation):
-    image = cv2.imread(image_annotations.file_path)
+def put_annotations_on_image(image: ndarray, image_annotations: ImageAnnotation):
     keypoints = image_annotations.keypoints
 
-    put_file_path(image, image_annotations.file_path)
+    put_text(image, [image_annotations.file_path, image_annotations.class_name])
     put_bounding_box(image, keypoints.bounding_box)
     for joint_name, localisation in keypoints.to_keypoint_dict().items():
         put_keypoint(image, localisation, joint_name)
 
+
+def display_annotations(image_annotations: ImageAnnotation):
+    image = cv2.imread(image_annotations.file_path)
+    put_annotations_on_image(image, image_annotations)
     cv2.imshow('annotations', image)
     cv2.waitKey()
 
 
-def put_file_path(image, file_path):
+def put_text(image, text_list):
     text_localisation = (25, 25)
-    cv2.putText(image, file_path, text_localisation, cv2.FONT_HERSHEY_SIMPLEX, 1, TEXT_COLOR, 2,
+    new_line_offset = (0, 25)
+
+    for text_line in text_list:
+        text_localisation = tuple([text_localisation[0] + new_line_offset[0],
+                                   text_localisation[1] + new_line_offset[1]])
+        cv2.putText(image, text_line, text_localisation, cv2.FONT_HERSHEY_SIMPLEX, 1, TEXT_COLOR, 2,
+                    cv2.LINE_AA)
+
+
+def put_class_name(image, class_name):
+    text_localisation = (25, 35)
+    cv2.putText(image, class_name, text_localisation, cv2.FONT_HERSHEY_SIMPLEX, 1, TEXT_COLOR, 2,
                 cv2.LINE_AA)
 
 
