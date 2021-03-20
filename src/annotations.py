@@ -194,6 +194,16 @@ class ImageAnnotation:
     def file_path(self):
         return _get_first_row_value_from_data_frame(self._data_frame, 'file_path')
 
+    @property
+    def class_name(self):
+        return _get_first_row_value_from_data_frame(self._data_frame, 'class')
+
+    @class_name.setter
+    def class_name(self, value):
+        if value not in SUPPORTED_CLASSES:
+            raise ValueError('{0} not in supported classes'.format(value))
+        self._data_frame['class'] = value
+
     def to_dataframe(self) -> pd.DataFrame:
         return self._data_frame.join(self.keypoints.to_dataframe())
 
