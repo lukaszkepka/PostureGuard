@@ -14,7 +14,7 @@ class PreProcessingStep(ABC):
         pass
 
 
-class KeepColumns(PreProcessingStep):
+class FilterColumns(PreProcessingStep):
 
     def __init__(self, column_names):
         self._column_names = column_names
