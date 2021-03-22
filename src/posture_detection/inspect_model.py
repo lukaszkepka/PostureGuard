@@ -1,4 +1,5 @@
 import argparse
+import os
 import os.path as path
 
 import cv2
@@ -19,10 +20,9 @@ def parse_args():
 
 
 def get_predictions_and_labels(model_path, annotations_data_frame):
-    model = SimpleNNModel(model_path)
-    model.load(model_path)
-    dataset, labels = model.preprocess(annotations_data_frame)
-    predictions = model.predict(dataset.values)
+    model = SimpleNNModel(model_path, load_weights=True)
+    labels = pd.Categorical(annotations_data_frame['class'], categories=SUPPORTED_CLASSES).codes
+    predictions = model.predict(annotations_data_frame)
     return predictions, labels
 
 

@@ -3,12 +3,11 @@ import os.path as path
 
 import cv2
 import numpy as np
-from tensorflow import keras
 
 from annotations import SUPPORTED_CLASSES, ImageAnnotation
 from data_preparation.display_annotations import put_annotations_on_image
 from keypoints_detection.factory import create_keypoint_detector
-from posture_detection.train_model import PREPROCESSING_PIPELINE
+from posture_detection.simple_nn_model import SimpleNNModel
 
 
 def parse_args():
@@ -36,26 +35,21 @@ def main(args):
         return
 
     keypoint_detector = create_keypoint_detector(args.keypoint_detector_model_path)
-    posture_detector = keras.models.load_model(args.posture_detector_model_path)
+    posture_detector = SimpleNNModel(args.posture_detector_model_path, load_weights=True)
 
     process_video(args.video_file_path, keypoint_detector, posture_detector)
 
 
 def process_frame(frame, keypoint_detector, posture_detector):
-    keypoints = keypoint_detector.detect(frame)
-    keypoints = keypoints[0]
-
     height, width, channels = frame.shape
 
-    annotation = ImageAnnotation.from_parameters('', (height, width), '', keypoints)
-    annotation_data_frame = annotation.to_dataframe()
+    keypoints = keypoint_detector.detect(frame)
+    if len(keypoints) == 0:
+        return
 
-    annotation_data_frame = PREPROCESSING_PIPELINE.run(annotation_data_frame)
-
-    predictions = posture_detector.predict(annotation_data_frame.values)
-    prediction_index = int(np.round(predictions))
-
-    annotation.class_name = SUPPORTED_CLASSES[prediction_index]
+    annotation = ImageAnnotation.from_parameters('', (height, width), '', keypoints[0])
+    predictions = posture_detector.predict(annotation.to_dataframe())
+    annotation.class_name = SUPPORTED_CLASSES[predictions[0]]
     put_annotations_on_image(frame, annotation)
 
 

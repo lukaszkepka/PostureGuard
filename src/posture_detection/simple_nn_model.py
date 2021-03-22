@@ -1,3 +1,4 @@
+import os
 import os.path as path
 from abc import abstractmethod
 
@@ -39,42 +40,49 @@ class SimpleNNModel(PostureDetectionModel):
         PointsToVectors(starting_point_name='center')
     ])
 
-    def __init__(self, model_path):
+    def __init__(self, model_path, load_weights=False):
         self._model = self._create_model()
         self._model_path = model_path
+        self._weights_path = os.path.join(self._model_path, 'weights')
 
-    def load(self, model_path):
-        self._model = tf.keras.models.load_model(model_path)
+        if load_weights:
+            self._load_weights()
 
-    def preprocess(self, dataset_data_frame: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
-        categories = pd.Categorical(dataset_data_frame['class'], categories=SUPPORTED_CLASSES).codes
-        return self.PREPROCESSING_PIPELINE.run(dataset_data_frame), categories
+    def preprocess(self, dataset_data_frame: pd.DataFrame) -> pd.DataFrame:
+        return self.PREPROCESSING_PIPELINE.run(dataset_data_frame)
 
-    def train(self, train_samples, test_samples, train_labels, test_labels):
+    def train(self, train_samples, test_samples, train_labels, test_labels, epochs=5000):
         if train_samples.shape[1] != self.INPUT_SIZE:
             raise ValueError(f'Invalid training set size, was {train_samples.shape[1]}, should be {self.INPUT_SIZE}')
 
         if test_samples.shape[1] != self.INPUT_SIZE:
             raise ValueError(f'Invalid test set size, was {test_samples.shape[1]}, should be {self.INPUT_SIZE}')
 
+        callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=20)
         self._model.compile(optimizer='Adam', loss='binary_crossentropy', metrics=['accuracy'])
-        history = self._model.fit(train_samples, train_labels, validation_data=(test_samples, test_labels), epochs=3000)
-        self._model.save(self._model_path, overwrite=True)
+        history = self._model.fit(train_samples, train_labels, validation_data=(test_samples, test_labels),
+                                  epochs=epochs, callbacks=[callback])
+
+        self._model.save_weights(self._weights_path, overwrite=True)
         self._show_and_save_history(history)
 
     def evaluate(self, dataset, labels):
         return self._model.evaluate(dataset, labels)
 
-    def predict(self, dataset: np.ndarray) -> np.ndarray:
+    def predict(self, dataset: pd.DataFrame) -> np.ndarray:
+        dataset = self.preprocess(dataset)
         predictions = self._model.predict(dataset)
-        return np.round(predictions)
+        return np.round(predictions).flatten().astype('int32')
 
     def _create_model(self):
         return tf.keras.Sequential([
             tf.keras.layers.Input(shape=self.INPUT_SIZE),
-            tf.keras.layers.Dense(15, activation='sigmoid'),
+            tf.keras.layers.Dense(8, activation='sigmoid'),
             tf.keras.layers.Dense(1, activation='sigmoid')
         ])
+
+    def _load_weights(self):
+        self._model.load_weights(self._weights_path)
 
     def _show_and_save_history(self, history):
         plt.plot(history.history['loss'], label='loss')

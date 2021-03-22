@@ -5,6 +5,7 @@ import os.path as path
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+from annotations import SUPPORTED_CLASSES
 from posture_detection.simple_nn_model import SimpleNNModel
 
 MODELS_DIRECTORY = './models'
@@ -38,7 +39,8 @@ def main(args):
 
 def prepare_dataset(preprocessing_function, annotations_file_path):
     annotations_data_frame = pd.read_csv(annotations_file_path)
-    preprocessed_dataset, categories = preprocessing_function(annotations_data_frame)
+    categories = pd.Categorical(annotations_data_frame['class'], categories=SUPPORTED_CLASSES).codes
+    preprocessed_dataset = preprocessing_function(annotations_data_frame)
     return train_test_split(preprocessed_dataset, categories, train_size=0.8)
 
 
