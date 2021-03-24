@@ -28,6 +28,6 @@ train_model.py --annotations_file_path D:\Datasets\images\annotations.csv --mode
 
  ## Example results
 
-| ![1](https://user-images.githubusercontent.com/30528808/112374421-5dda0980-8ce2-11eb-9fd0-5adc2e67283e.png)        | ![3](https://user-images.githubusercontent.com/30528808/112374459-6b8f8f00-8ce2-11eb-837b-0129bb8a7adb.png)           |
-| ------------- |:-------------:|
-|![2](https://user-images.githubusercontent.com/30528808/112374463-6cc0bc00-8ce2-11eb-809d-9398074923a8.png)|![4](https://user-images.githubusercontent.com/30528808/112374467-6d595280-8ce2-11eb-9ccb-8b45c5a45c5f.png)|
+[![Video](http://img.youtube.com/vi/iDZBXymW2wM/0.jpg)](https://youtu.be/iDZBXymW2wM)
+
+
