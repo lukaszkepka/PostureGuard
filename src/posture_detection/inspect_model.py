@@ -1,14 +1,13 @@
 import argparse
+import os
 import os.path as path
 
 import cv2
-import numpy as np
 import pandas as pd
 import tensorflow as tf
-from tensorflow import keras
 
 from annotations import SUPPORTED_CLASSES
-from posture_detection.train_model import PREPROCESSING_PIPELINE
+from posture_detection.simple_nn_model import SimpleNNModel
 
 
 def parse_args():
@@ -21,13 +20,9 @@ def parse_args():
 
 
 def get_predictions_and_labels(model_path, annotations_data_frame):
-    model = keras.models.load_model(model_path)
-
-    dataset = PREPROCESSING_PIPELINE.run(annotations_data_frame)
+    model = SimpleNNModel(model_path, load_weights=True)
     labels = pd.Categorical(annotations_data_frame['class'], categories=SUPPORTED_CLASSES).codes
-
-    predictions = model.predict(dataset.values)
-    predictions = np.round(predictions)
+    predictions = model.predict(annotations_data_frame)
     return predictions, labels
 
 

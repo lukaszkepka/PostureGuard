@@ -2,13 +2,20 @@ import argparse
 import os.path as path
 
 import cv2
-import numpy as np
-from tensorflow import keras
 
-from annotations import SUPPORTED_CLASSES, ImageAnnotation
-from data_preparation.display_annotations import put_annotations_on_image
+from annotations import SUPPORTED_CLASSES, ImageAnnotation, Keypoints
+from drawing.image_overlay import ImageOverlayPipeline, BoundingBoxImageOverlayStep, KeypointsImageOverlayStep, \
+    ClassNameImageOverlay
 from keypoints_detection.factory import create_keypoint_detector
-from posture_detection.train_model import PREPROCESSING_PIPELINE
+from posture_detection.simple_nn_model import SimpleNNModel, PostureDetectionModel
+
+BOUNDING_BOX_COLOR = (0, 255, 255)
+KEYPOINT_COLOR = (0, 255, 0)
+TEXT_COLOR = (255, 0, 0)
+CLASS_NAME_TO_COLOR = {
+    SUPPORTED_CLASSES[0]: (0, 0, 255),
+    SUPPORTED_CLASSES[1]: (0, 255, 0)
+}
 
 
 def parse_args():
@@ -36,27 +43,38 @@ def main(args):
         return
 
     keypoint_detector = create_keypoint_detector(args.keypoint_detector_model_path)
-    posture_detector = keras.models.load_model(args.posture_detector_model_path)
+    posture_detector = SimpleNNModel(args.posture_detector_model_path, load_weights=True)
 
     process_video(args.video_file_path, keypoint_detector, posture_detector)
 
 
+def run_posture_detection(frame, keypoints: Keypoints, posture_detector: PostureDetectionModel):
+    height, width, channels = frame.shape
+    frame_annotation = ImageAnnotation.from_parameters('', (height, width), '', keypoints)
+    predictions = posture_detector.predict(frame_annotation.to_dataframe())
+    return SUPPORTED_CLASSES[predictions[0]]
+
+
 def process_frame(frame, keypoint_detector, posture_detector):
     keypoints = keypoint_detector.detect(frame)
+    if len(keypoints) == 0:
+        return
+
+    # We process only first detection
     keypoints = keypoints[0]
 
-    height, width, channels = frame.shape
+    class_name = run_posture_detection(frame, keypoints, posture_detector)
+    put_annotations_on_image(frame, keypoints, class_name)
 
-    annotation = ImageAnnotation.from_parameters('', (height, width), '', keypoints)
-    annotation_data_frame = annotation.to_dataframe()
 
-    annotation_data_frame = PREPROCESSING_PIPELINE.run(annotation_data_frame)
+def put_annotations_on_image(image, keypoints, class_name):
+    image_overlay = ImageOverlayPipeline([
+        BoundingBoxImageOverlayStep(keypoints.bounding_box, color=BOUNDING_BOX_COLOR),
+        KeypointsImageOverlayStep(keypoints, keypoint_color=KEYPOINT_COLOR, text_color=TEXT_COLOR),
+        ClassNameImageOverlay(class_name, CLASS_NAME_TO_COLOR)
+    ])
 
-    predictions = posture_detector.predict(annotation_data_frame.values)
-    prediction_index = int(np.round(predictions))
-
-    annotation.class_name = SUPPORTED_CLASSES[prediction_index]
-    put_annotations_on_image(frame, annotation)
+    image_overlay.apply(image)
 
 
 def process_video(video_file_path, keypoint_detector, posture_detector):

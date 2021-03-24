@@ -6,6 +6,8 @@ import pandas as pd
 from numpy.core.multiarray import ndarray
 
 from annotations import ImageAnnotation, data_frame_to_annotations_list
+from drawing.image_overlay import ImageOverlayPipeline, TextImageOverlayStep, BoundingBoxImageOverlayStep, \
+    KeypointsImageOverlayStep
 
 BOUNDING_BOX_COLOR = (0, 255, 255)
 KEYPOINT_COLOR = (0, 255, 0)
@@ -22,10 +24,13 @@ def parse_args():
 def put_annotations_on_image(image: ndarray, image_annotations: ImageAnnotation):
     keypoints = image_annotations.keypoints
 
-    put_text(image, [image_annotations.file_path, image_annotations.class_name])
-    put_bounding_box(image, keypoints.bounding_box)
-    for joint_name, localisation in keypoints.to_keypoint_dict().items():
-        put_keypoint(image, localisation, joint_name)
+    image_overlay = ImageOverlayPipeline([
+        TextImageOverlayStep([image_annotations.file_path, image_annotations.class_name], text_color=TEXT_COLOR),
+        BoundingBoxImageOverlayStep(keypoints.bounding_box, color=BOUNDING_BOX_COLOR),
+        KeypointsImageOverlayStep(keypoints, keypoint_color=KEYPOINT_COLOR, text_color=TEXT_COLOR)
+    ])
+
+    image_overlay.apply(image)
 
 
 def display_annotations(image_annotations: ImageAnnotation):
@@ -33,37 +38,6 @@ def display_annotations(image_annotations: ImageAnnotation):
     put_annotations_on_image(image, image_annotations)
     cv2.imshow('annotations', image)
     cv2.waitKey()
-
-
-def put_text(image, text_list):
-    text_localisation = (25, 25)
-    new_line_offset = (0, 25)
-
-    for text_line in text_list:
-        text_localisation = tuple([text_localisation[0] + new_line_offset[0],
-                                   text_localisation[1] + new_line_offset[1]])
-        cv2.putText(image, text_line, text_localisation, cv2.FONT_HERSHEY_SIMPLEX, 1, TEXT_COLOR, 2,
-                    cv2.LINE_AA)
-
-
-def put_class_name(image, class_name):
-    text_localisation = (25, 35)
-    cv2.putText(image, class_name, text_localisation, cv2.FONT_HERSHEY_SIMPLEX, 1, TEXT_COLOR, 2,
-                cv2.LINE_AA)
-
-
-def put_bounding_box(image, bounding_box):
-    cv2.rectangle(image, bounding_box[0], bounding_box[1], BOUNDING_BOX_COLOR)
-
-
-def put_keypoint(image, localisation, name):
-    text_to_point_offset = (0, 10)
-    text_localisation = tuple([localisation[0] + text_to_point_offset[0],
-                               localisation[1] + text_to_point_offset[1]])
-
-    cv2.circle(image, localisation, 3, KEYPOINT_COLOR, -1)
-    cv2.putText(image, name, text_localisation, cv2.FONT_HERSHEY_SIMPLEX, 1, TEXT_COLOR, 2,
-                cv2.LINE_AA)
 
 
 def main(args):
