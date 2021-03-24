@@ -2,12 +2,12 @@ import os
 import os.path as path
 from abc import abstractmethod
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import tensorflow as tf
 
-from annotations import Keypoints, SUPPORTED_CLASSES
+from annotations import Keypoints
 from posture_detection.preprocessing import PreProcessingPipeline, NormalizePointCoordinatesToBoundingBox, \
     FilterColumns, PointsToVectors
 
@@ -15,7 +15,7 @@ from posture_detection.preprocessing import PreProcessingPipeline, NormalizePoin
 class PostureDetectionModel:
 
     @abstractmethod
-    def preprocess(self, dataset_data_frame: pd.DataFrame) -> (pd.DataFrame, pd.DataFrame):
+    def preprocess(self, dataset_data_frame: pd.DataFrame) -> pd.DataFrame:
         pass
 
     @abstractmethod

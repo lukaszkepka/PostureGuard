@@ -19,7 +19,7 @@ CLASS_NAME_TO_COLOR = {
 
 
 def parse_args():
-    ap = argparse.ArgumentParser(description="")
+    ap = argparse.ArgumentParser(description="Runs posture detection on video file and displays results in realtime")
     ap.add_argument("-i", "--video_file_path", required=True,
                     help="Path to input video file")
     ap.add_argument("-p", "--posture_detector_model_path", required=True,

@@ -1,5 +1,4 @@
 import argparse
-import os
 import os.path as path
 
 import cv2
@@ -11,7 +10,7 @@ from posture_detection.simple_nn_model import SimpleNNModel
 
 
 def parse_args():
-    ap = argparse.ArgumentParser(description="")
+    ap = argparse.ArgumentParser(description="Evaluates trained posture detection model")
     ap.add_argument("-i", "--annotations_file_path", required=True,
                     help="Path to annotations in csv format")
     ap.add_argument("-m", "--model_path", required=True,

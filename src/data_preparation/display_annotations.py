@@ -23,7 +23,6 @@ def parse_args():
 
 def put_annotations_on_image(image: ndarray, image_annotations: ImageAnnotation):
     keypoints = image_annotations.keypoints
-
     image_overlay = ImageOverlayPipeline([
         TextImageOverlayStep([image_annotations.file_path, image_annotations.class_name], text_color=TEXT_COLOR),
         BoundingBoxImageOverlayStep(keypoints.bounding_box, color=BOUNDING_BOX_COLOR),

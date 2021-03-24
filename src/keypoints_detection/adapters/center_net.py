@@ -1,7 +1,7 @@
 import os
 from typing import List
+
 import numpy as np
-import cv2
 
 from CenterNet.src.lib.detectors.detector_factory import detector_factory
 from CenterNet.src.lib.opts import opts
