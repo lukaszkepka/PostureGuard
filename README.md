@@ -1,6 +1,3 @@
-
-https://user-images.githubusercontent.com/30528808/112376291-8f53d480-8ce4-11eb-994b-ce860fdb4d02.mp4
-
 # PostureGuard
 Realtime detection of incorrect sitting posture 
 
